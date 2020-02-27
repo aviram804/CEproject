@@ -1,6 +1,7 @@
 import numpy as np
 from Detector import detect_intrusion
 from BrainDataChunk import BrainDataChunk
+import Brain
 
 SENT = 0
 RECEIVED = 1
@@ -34,22 +35,42 @@ class PacketPerTime:
         """
         packets = {}
         for ip, tup in obj_map.items():
+            Brain.IP_SET.add(ip)
             packets[ip] = (BrainDataChunk.get_from_str(tup[SENT]), BrainDataChunk.get_from_str(tup[RECEIVED]))
         return PacketPerTime(packets, time)
 
     def update(self, other):
         """
-
-        :param other:
-        :return:
+        updates petTime in given other per time
+        :param other: PacketPerTime
+        :return: updated PacketPerTime
         """
         if other is None:
             return self
         for ip, tup in other.packets_map.items():
+            self.add_chunk(ip, tup)
 
-            if ip not in self.packets_map:
-                self.packets_map[ip] = tup
-                continue
+    def add_chunk(self, ip, tup):
+        """
+        adds chunk to chunks per time
+        :param ip: ip to update
+        :param tup: BrainDataChunk tuple, sent received
+        """
+        if ip not in self.packets_map:
+            self.packets_map[ip] = tup
+            return
+        self.packets_map[ip][SENT].update(tup[SENT])
+        self.packets_map[ip][RECEIVED].update(tup[RECEIVED])
 
-            self.packets_map[ip][SENT].update(tup[SENT])
-            self.packets_map[ip][RECEIVED].update(tup[RECEIVED])
+    def add_packet(self, packet):
+        """
+        updates 2 ips in given PacketChunk object
+        :param packet: PacketChunk, sender receiver ip's and amount of data
+        :return:
+        """
+        chunk = BrainDataChunk("B", packet.amount, 1)
+        empty = BrainDataChunk("B", 0, 0)
+        sender = chunk, empty
+        reciever = empty, chunk
+        self.add_chunk(packet.sender, sender)
+        self.add_chunk(packet.reciever, reciever)
