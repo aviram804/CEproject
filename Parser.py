@@ -1,6 +1,5 @@
 import pyshark
-from Chunks import Chunk
-import ChunksBase
+
 
 """
 this script parsing a pcapng file that generate on wireShark 
@@ -11,14 +10,15 @@ to our database
 
 packets = pyshark.FileCapture("C:\\Users\\aviram\\PycharmProjects\\WiresharkParser\\PacketsData.pcapng")
 
-packetsBase = ChunksBase.ChunksBase()
+# packetsBase = ChunksBase.ChunksBase(5
 
 for packet in packets:
-    try:
-        packetsBase.add(Chunk(packet.captured_length, packet.ip.addr, packet.ip.dst, packet.frame_info.time))
-        print(packet.ip.addr)
-    except:
-        print("no src")
+    # try:
+        # packetsBase.add(Chunk(packet.captured_length, packet.ip.addr, packet.ip.dst, packet.frame_info.time))
 
+
+
+    # except:
+        print("no src")
 
 
