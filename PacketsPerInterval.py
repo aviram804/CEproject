@@ -1,8 +1,9 @@
 import PacketPerTime
-TIME_INTERVAL = 5
 
 
 class PacketsPerInterval:
+
+    INTERVAL = 5
 
     def __init__(self, packets):
         """
@@ -18,5 +19,10 @@ class PacketsPerInterval:
         :param packet_per_time:
         :return:
         """
+        if len(self.packets) < self.INTERVAL:
+            self.packets.append(packet_per_time)
+            return None
+        to_throw = self.packets[self.oldest]
         self.packets[self.oldest] = packet_per_time
-        self.oldest = (self.oldest + 1) % TIME_INTERVAL
+        self.oldest = (self.oldest + 1) % self.INTERVAL
+        return to_throw

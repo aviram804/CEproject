@@ -22,7 +22,7 @@ BYTES_PERCENT = 50
 KB_PERCENT = 45
 MB_PERCENT = 4
 
-FILE_NAME = "C:\\Users\\aviram\\PycharmProjects\\engineerProject\\data"
+FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\data"
 
 #############################################
 #              NOT PARAMETRIC               #
@@ -42,7 +42,7 @@ def my_size_func():
     # return np.random.randint(1, 100)
     mean = 500
     var = 300
-    return np.random.normal(mean, var)
+    return abs(int(np.random.normal(mean, var)))
 
 
 def my_update_func():
@@ -81,19 +81,20 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
     ips = list(ips)
     brain_dict = {}
     for i in range(seconds):
-        indexes = np.random.choice(num_ips, num_different_ips)
         time_dict = {}
+        indexes = np.random.choice(num_ips, num_different_ips)
         for idx in indexes:
-            size = size_func()
-            sent = "(" + str(size_func()) + SET_SIZE(size) + ", updates=" + str(updates_func()) + ")"
-            size = size_func()
-            receive = "(" + str(size_func()) + SET_SIZE(size) + ", updates=" + str(updates_func()) + ")"
+            size, data_type = SET_SIZE(size_func())
+            sent = "(" + str(size) + data_type + ", updates=" + str(updates_func()) + ")"
+            size, data_type = SET_SIZE(size_func())
+            receive = "(" + str(size) + data_type + ", updates=" + str(updates_func()) + ")"
             time_dict[ips[idx]] = [sent, receive]
+
+        brain_dict[i] = time_dict
 
     return brain_dict
 
 
 data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
-#
-# with open(FILE_NAME, 'w') as json_file:
-#     json.dump(data_dict, json_file)
+with open(FILE_NAME, 'w') as json_file:
+    json.dump(data_dict, json_file)
