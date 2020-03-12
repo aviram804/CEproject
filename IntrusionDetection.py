@@ -3,6 +3,7 @@ from PacketPerTime import PacketPerTime
 from Brain import Brain
 import Detector
 from PacketsPerInterval import PacketsPerInterval
+import JsonParser
 
 """
 this script parsing a pcapng file that generate on wireShark 
@@ -16,6 +17,8 @@ packets = pyshark.FileCapture("C:\\Users\\aviram\\PycharmProjects\\WiresharkPars
 # packetsBase = ChunksBase.ChunksBase(5
 
 # TODO: create Paser -> pyshark to Packet
+
+
 def parse(packet):
     return packet
 
@@ -30,7 +33,7 @@ per_time = PacketPerTime({}, current_time)
 per_time_interval = PacketsPerInterval([])
 
 # brain:  BrainObj
-brain = Brain({}, set())
+brain = Brain.generate_from_json(JsonParser.FILE_NAME)
 
 # current_time = packets[0][TIME]
 
@@ -44,18 +47,19 @@ for packet in packets:
 
     if packet_chunk.time == current_time:
         per_time.add_packet(packet_chunk)
+        Detector.find_new_ips([packet_chunk.sender, packet_chunk.receiver], brain.ip_set, brain.malicious_ips)
         continue
 
     to_update = per_time_interval.update(per_time)
     if to_update is not None:
-        brain.update(to_update)
+        intrusions = brain.update(to_update)
+        for intrusion in intrusions:
+            intrusion.get_error()
+
     brain_interval = brain.get_interval(current_time, PacketsPerInterval.INTERVAL)
-    Detector.detect_intrusion(brain_interval, per_time_interval)
+    Detector.detect_intrusion(brain_interval, per_time_interval, brain.ip_set, brain.malicious_ips)
     per_time = []
-
-
-        # per_time.add_chunk(packet_chunk)
-
+    current_time += 1
 
 
 

@@ -3,7 +3,19 @@ import PacketPerTime
 from PacketsPerInterval import PacketsPerInterval
 import Intrusions
 
-def detect_intrusion(packet1, packet2):
+
+def find_new_ips(to_check, ips, malicious_ips):
+
+    for ip in to_check:
+        if ip not in ips:
+            err = Intrusions.FoundNewIP(ip)
+            err.get_error()
+        if ip in malicious_ips:
+            err = Intrusions.FoundMaliciousIP(ip)
+            err.get_error()
+
+
+def detect_intrusion(packet1, packet2, ips, malicious_ips):
     """
     detect intrusion between 2 packets per time intervals
     :param packet1: PacketPerTimeInterval

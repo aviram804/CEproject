@@ -11,6 +11,9 @@ class FoundNewIP:
         """
         self.ip = ip
 
+    def get_error(self):
+        print("New IP Warning ", self.ip)
+
 
 class FoundMaliciousIP:
     """
@@ -23,3 +26,5 @@ class FoundMaliciousIP:
         """
         self.ip = ip
 
+    def get_error(self):
+        print("Malicious IP Warning ", self.ip)

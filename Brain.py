@@ -50,7 +50,12 @@ class Brain:
         return Brain(packets_per_time_dict, IP_SET, malicious_ips)
 
     def update(self, packets_per_time):
-            return self.data_map[packets_per_time.time].update(packets_per_time)
+        """
+        updates packet_per_time  inside Brain
+        :param packets_per_time: PacketPerTime
+        :return: list of intrusions detected (new, malicious ip's)
+        """
+        self.data_map[packets_per_time.time].update(packets_per_time)
 
     def get_interval(self, current_time, interval):
         """
@@ -70,6 +75,7 @@ class Brain:
 
     def is_malicious_ips(self, IP):
         return IP in self.malicious_ips
+
 
 if __name__ == '__main__':
     brain = Brain.generate_from_json(JsonParser.FILE_NAME)

@@ -2,7 +2,6 @@ import numpy as np
 from Detector import detect_intrusion
 from BrainDataChunk import BrainDataChunk
 import Brain
-import Intrusions
 
 SENT = 0
 RECEIVED = 1
@@ -46,14 +45,10 @@ class PacketPerTime:
         :param other: PacketPerTime
         :return: updated PacketPerTime
         """
-        intrusions = []
         if other is None:
-            return intrusions
+            return
         for ip, tup in other.packets_map.items():
-            intrusion = self.add_chunk(ip, tup)
-            if intrusion is not None:
-                intrusions.append(intrusion)
-        return intrusions
+            self.add_chunk(ip, tup)
 
     def add_chunk(self, ip, tup):
         """
@@ -63,7 +58,7 @@ class PacketPerTime:
         """
         if ip not in self.packets_map:
             self.packets_map[ip] = tup
-            return Intrusions.FoundNewIP(ip)
+            return
         self.packets_map[ip][SENT].update(tup[SENT])
         self.packets_map[ip][RECEIVED].update(tup[RECEIVED])
 
