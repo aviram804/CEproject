@@ -1,12 +1,11 @@
-from PacketPerTime import PacketPerTime
+import PacketPerTime
 from BrainDataChunk import BrainDataChunk
 from PacketsPerInterval import PacketsPerInterval
-import JsonParser
 import json
 
 
-IP_SET = set()
 MALICIOUS_IP = "malicious_ips"
+
 
 class Brain:
 
@@ -46,8 +45,8 @@ class Brain:
             if key == MALICIOUS_IP:
                 malicious_ips = value
                 continue
-            packets_per_time_dict[key] = PacketPerTime.from_json(value, key)
-        return Brain(packets_per_time_dict, IP_SET, malicious_ips)
+            packets_per_time_dict[key] = PacketPerTime.PacketPerTime.from_json(value, key)
+        return Brain(packets_per_time_dict, PacketPerTime.IP_SET, malicious_ips)
 
     def update(self, packets_per_time):
         """
@@ -55,6 +54,9 @@ class Brain:
         :param packets_per_time: PacketPerTime
         :return: list of intrusions detected (new, malicious ip's)
         """
+        if packets_per_time.time not in self.data_map:
+            self.data_map[packets_per_time.time] = packets_per_time
+            return
         self.data_map[packets_per_time.time].update(packets_per_time)
 
     def get_interval(self, current_time, interval):
@@ -67,15 +69,13 @@ class Brain:
         for i in range(interval):
             time = current_time + i
             if time not in self.data_map.keys():
-                packet_interval.update([])
+                packet_interval.update(PacketPerTime.PacketPerTime({}, time))
+                continue
             packet_interval.update(self.data_map[time])
+        return packet_interval
 
-    def add_malicious_ips(self, IP):
-        self.malicious_ips.add(IP)
+    def add_malicious_ips(self, ip):
+        self.malicious_ips.add(ip)
 
-    def is_malicious_ips(self, IP):
-        return IP in self.malicious_ips
-
-
-if __name__ == '__main__':
-    brain = Brain.generate_from_json(JsonParser.FILE_NAME)
+    def is_malicious_ips(self, ip):
+        return ip in self.malicious_ips

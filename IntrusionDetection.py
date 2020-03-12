@@ -12,7 +12,7 @@ to our database
 """
 
 
-packets = pyshark.FileCapture("C:\\Users\\aviram\\PycharmProjects\\WiresharkParser\\PacketsData.pcapng")
+# packets = pyshark.FileCapture("C:\\Users\\aviram\\PycharmProjects\\WiresharkParser\\PacketsData.pcapng")
 
 # packetsBase = ChunksBase.ChunksBase(5
 
@@ -32,8 +32,10 @@ per_time = PacketPerTime({}, current_time)
 # pet_time_interval: PacketPerInterval - last 5 PacketsPerTime
 per_time_interval = PacketsPerInterval([])
 
+
+brain, packets = JsonParser.json_get_brain_chunks()
 # brain:  BrainObj
-brain = Brain.generate_from_json(JsonParser.FILE_NAME)
+# brain = Brain.generate_from_json(JsonParser.FILE_NAME)
 
 # current_time = packets[0][TIME]
 
@@ -52,15 +54,13 @@ for packet in packets:
 
     to_update = per_time_interval.update(per_time)
     if to_update is not None:
-        intrusions = brain.update(to_update)
-        for intrusion in intrusions:
-            intrusion.get_error()
+        brain.update(to_update)
+
 
     brain_interval = brain.get_interval(current_time, PacketsPerInterval.INTERVAL)
     Detector.detect_intrusion(brain_interval, per_time_interval, brain.ip_set, brain.malicious_ips)
-    per_time = []
     current_time += 1
-
+    per_time = PacketPerTime({}, current_time)
 
 
 

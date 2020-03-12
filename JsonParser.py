@@ -1,7 +1,9 @@
 import json
 import numpy as np
 from BrainDataChunk import BrainDataChunk
-import Brain
+from Brain import Brain
+from PacketChunk import *
+import random
 
 SET_SIZE = BrainDataChunk.get_scale_for_size
 DATA_TYPES = BrainDataChunk.TYPES
@@ -23,7 +25,8 @@ BYTES_PERCENT = 50
 KB_PERCENT = 45
 MB_PERCENT = 4
 
-FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\data"
+FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\CEproject\\data"
+MALICIOUS_IP = "malicious_ips"
 
 #############################################
 #              NOT PARAMETRIC               #
@@ -79,6 +82,13 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
         ip = rand_ip()
         ips.add(ip)
 
+    malicious_ips = set()
+    while len(malicious_ips) < 10:
+        ip = rand_ip()
+        if ip in ips:
+            continue
+        malicious_ips.add(ip)
+
     ips = list(ips)
     brain_dict = {}
     for i in range(seconds):
@@ -92,10 +102,46 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
             time_dict[ips[idx]] = [sent, receive]
 
         brain_dict[i] = time_dict
-    brain_dict[Brain.MALICIOUS_IP] = set()
+    brain_dict[MALICIOUS_IP] = list(malicious_ips)
     return brain_dict
 
+def get_ip(ips, malicious_ips):
+    ips = list(ips)
+    choser = random.randint(0, 100)
+    if choser < 95:
+        rand = random.randint(0, len(ips))
+        return ips[rand - 1]
+    if choser < 100:
+        return rand_ip()
+    rand = random.randint(0, len(malicious_ips))
+    return malicious_ips[rand - 1]
 
-data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
-with open(FILE_NAME, 'w') as json_file:
-    json.dump(data_dict, json_file)
+
+
+def get_chunk(time, ips, malicious_ips):
+    sender = get_ip(ips, malicious_ips)
+    reciever = sender
+    while reciever == sender:
+        reciever = get_ip(ips, malicious_ips)
+    return PacketChunk(sender,reciever,my_size_func(),time)
+
+
+def write_packet_chunks(ips, malicious_ips):
+    list_chuncks = []
+    malicious = list(malicious_ips)
+    ips_list = list(ips)
+
+    for i in range(SECONDS):
+        for j in range(100):
+            list_chuncks.append(get_chunk(i, ips_list, malicious))
+    return list_chuncks
+
+
+def json_get_brain_chunks():
+
+    data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
+    with open(FILE_NAME, 'w') as json_file:
+        json.dump(data_dict, json_file)
+    brain = Brain.generate_from_json(FILE_NAME)
+    list_chuncks = write_packet_chunks(brain.ip_set, brain.malicious_ips)
+    return brain, list_chuncks

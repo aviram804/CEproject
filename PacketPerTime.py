@@ -1,11 +1,11 @@
 import numpy as np
 from Detector import detect_intrusion
 from BrainDataChunk import BrainDataChunk
-import Brain
+
 
 SENT = 0
 RECEIVED = 1
-
+IP_SET = set()
 
 class PacketPerTime:
 
@@ -35,7 +35,7 @@ class PacketPerTime:
         """
         packets = {}
         for ip, tup in obj_map.items():
-            Brain.IP_SET.add(ip)
+            IP_SET.add(ip)
             packets[ip] = (BrainDataChunk.get_from_str(tup[SENT]), BrainDataChunk.get_from_str(tup[RECEIVED]))
         return PacketPerTime(packets, time)
 
@@ -56,6 +56,7 @@ class PacketPerTime:
         :param ip: ip to update
         :param tup: BrainDataChunk tuple, sent received
         """
+        sent, recieved = tup
         if ip not in self.packets_map:
             self.packets_map[ip] = tup
             return
@@ -71,6 +72,6 @@ class PacketPerTime:
         chunk = BrainDataChunk("B", packet.amount, 1)
         empty = BrainDataChunk("B", 0, 0)
         sender = chunk, empty
-        reciever = empty, chunk
+        receiver = empty, chunk
         self.add_chunk(packet.sender, sender)
-        self.add_chunk(packet.reciever, reciever)
+        self.add_chunk(packet.receiver, receiver)
