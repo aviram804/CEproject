@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from BrainDataChunk import BrainDataChunk
+import Brain
 
 SET_SIZE = BrainDataChunk.get_scale_for_size
 DATA_TYPES = BrainDataChunk.TYPES
@@ -91,7 +92,7 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
             time_dict[ips[idx]] = [sent, receive]
 
         brain_dict[i] = time_dict
-
+    brain_dict[Brain.MALICIOUS_IP] = set()
     return brain_dict
 
 
