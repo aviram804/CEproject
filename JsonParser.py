@@ -1,7 +1,10 @@
 import json
 import numpy as np
 from BrainDataChunk import BrainDataChunk
-import Brain
+from Brain import Brain
+from PacketChunk import *
+import random
+import Intrusions
 
 SET_SIZE = BrainDataChunk.get_scale_for_size
 DATA_TYPES = BrainDataChunk.TYPES
@@ -23,7 +26,8 @@ BYTES_PERCENT = 50
 KB_PERCENT = 45
 MB_PERCENT = 4
 
-FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\data"
+FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\CEproject\\data"
+MALICIOUS_IP = "malicious_ips"
 
 #############################################
 #              NOT PARAMETRIC               #
@@ -34,6 +38,9 @@ IP_RANGE = (100, 300)
 LOW = 0
 HIGH = 1
 
+MEAN = 500
+VAR = 50
+
 
 def my_size_func():
     """
@@ -41,8 +48,22 @@ def my_size_func():
     :return: int
     """
     # return np.random.randint(1, 100)
-    mean = 500
-    var = 300
+    mean = MEAN
+    var = VAR
+    return abs(int(np.random.normal(mean, var)))
+
+
+ALPHA = 2
+BETA = 1
+
+
+def intrusion_size_func():
+    """
+    randomized function for intrusion packet size
+    :return: int
+    """
+    mean = MEAN * ALPHA
+    var = VAR * BETA
     return abs(int(np.random.normal(mean, var)))
 
 
@@ -79,6 +100,13 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
         ip = rand_ip()
         ips.add(ip)
 
+    malicious_ips = set()
+    while len(malicious_ips) < 10:
+        ip = rand_ip()
+        if ip in ips:
+            continue
+        malicious_ips.add(ip)
+
     ips = list(ips)
     brain_dict = {}
     for i in range(seconds):
@@ -92,10 +120,104 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
             time_dict[ips[idx]] = [sent, receive]
 
         brain_dict[i] = time_dict
-    brain_dict[Brain.MALICIOUS_IP] = set()
+    brain_dict[MALICIOUS_IP] = list(malicious_ips)
     return brain_dict
 
 
-data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
-with open(FILE_NAME, 'w') as json_file:
-    json.dump(data_dict, json_file)
+CHOSE_IP_PERCENT = 95
+RAND_IP_PERCENT = 4
+
+
+def get_ip(ips, malicious_ips):
+    """
+    Randomly choose ip from:
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: random IP
+    """
+    ips = list(ips)
+    chooser = random.randint(0, 100)
+    if chooser <= CHOSE_IP_PERCENT:
+        rand = random.randint(0, len(ips))
+        return ips[rand - 1]
+    if chooser <= (CHOSE_IP_PERCENT + RAND_IP_PERCENT):
+        return rand_ip()
+    rand = random.randint(0, len(malicious_ips))
+    return malicious_ips[rand - 1]
+
+
+def get_chunk(time, ips, malicious_ips, size_func):
+    """
+    creates a single chunk with time stamp
+    :param time: int, time stamp
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: PacketChunk - has a sender, a receiver, size and time
+    """
+    sender = get_ip(ips, malicious_ips)
+    receiver = sender
+    while receiver == sender:
+        receiver = get_ip(ips, malicious_ips)
+    return PacketChunk(sender, receiver, size_func(), time)
+
+
+IPS_PER_TIME = 500
+
+
+def write_packet_chunks(ips, malicious_ips):
+    """
+    generates packets according to the ips presented in Brain - test tool
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: new input data
+    """
+    list_chuncks = []
+    malicious = list(malicious_ips)
+    ips_list = list(ips)
+
+    for i in range(SECONDS):
+        for j in range(IPS_PER_TIME):
+            list_chuncks.append(get_chunk(i, ips_list, malicious, my_size_func))
+    return list_chuncks, None
+
+
+INTRUSION_PERCENTAGE = 2
+
+
+def write_intrusion_packet_chunk(ips, malicious_ips):
+    """
+    generates packets according to the ips presented in Brain - with percentage for intrusion
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: new input data, intrusions
+    """
+    list_chuncks = []
+    intrusion_chunks = set()
+    malicious = list(malicious_ips)
+    ips_list = list(ips)
+
+    for i in range(SECONDS):
+        for j in range(IPS_PER_TIME):
+            size_func = my_size_func
+            rand = random.randint(0, 1000)
+            if rand < INTRUSION_PERCENTAGE:
+                size_func = intrusion_size_func
+            chunk = get_chunk(i, ips_list, malicious, size_func)
+            list_chuncks.append(chunk)
+            intrusion_chunks.add(Intrusions.IPOverReceived(chunk.receiver, chunk.amount, chunk.time))
+            intrusion_chunks.add(Intrusions.IPOverSent(chunk.sender, chunk.amount, chunk.time))
+    # returns list of chunks to run on, and map of IP and list of intrusion at seconds
+    return list_chuncks, intrusion_chunks
+
+
+def json_get_brain_chunks(packet_func):
+    """
+
+    :return:
+    """
+    data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
+    with open(FILE_NAME, 'w') as json_file:
+        json.dump(data_dict, json_file)
+    brain = Brain.generate_from_json(FILE_NAME)
+    list_chunks, intrusions = packet_func(brain.ip_set, brain.malicious_ips)
+    return brain, list_chunks, intrusions
