@@ -2,7 +2,7 @@ import PacketPerTime
 from BrainDataChunk import BrainDataChunk
 from PacketsPerInterval import PacketsPerInterval
 import json
-
+from random import randint
 
 MALICIOUS_IP = "malicious_ips"
 
@@ -18,6 +18,7 @@ class Brain:
         self.data_map = data_map
         self.ip_set = ip_set
         self.malicious_ips = malicious_ips
+        self.ip_country_map = {}
 
     def generate_jason(self, dest):
         """
@@ -75,7 +76,45 @@ class Brain:
         return packet_interval
 
     def add_malicious_ips(self, ip):
+        """
+        adds ip to malicious_ips set
+        :param ip: string, IP
+        """
         self.malicious_ips.add(ip)
 
     def is_malicious_ips(self, ip):
+        """
+        :param ip: string, IP
+        :return: boolean, is malicious ip
+        """
         return ip in self.malicious_ips
+
+    def load_ip_country_map(self, filename):
+        """
+        loads ip to country map using filename
+        :param filename: string
+        """
+        pass
+
+# COUNTRIES PERCENTAGE:
+    PERCENTAGE = [
+        [88, "Israel"],
+        [3, "China"],
+        [3, "USA"],
+        [3, "GBR"],
+        [3, "Germany"]
+    ]
+
+    def generate_ip_country_map(self):
+        """
+        randomly generate ip to country map - test tool
+        """
+        brain_map = Brain.PERCENTAGE
+        for ip in self.ip_set:
+            chooser = randint(0, 100)
+            current = 0
+            for i in range(len(brain_map)):
+                current += brain_map[i][0]
+                if chooser <= current:
+                    self.ip_country_map[ip] = brain_map[i][1]
+                    break

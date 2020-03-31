@@ -34,6 +34,9 @@ per_time_interval = PacketsPerInterval([])
 
 
 brain, packets = JsonParser.json_get_brain_chunks()
+brain.generate_ip_country_map()
+
+
 # brain:  BrainObj
 # brain = Brain.generate_from_json(JsonParser.FILE_NAME)
 
@@ -49,7 +52,7 @@ for packet in packets:
 
     if packet_chunk.time == current_time:
         per_time.add_packet(packet_chunk)
-        Detector.find_new_ips([packet_chunk.sender, packet_chunk.receiver], brain.ip_set, brain.malicious_ips)
+        # Detector.find_new_ips([packet_chunk.sender, packet_chunk.receiver], brain.ip_set, brain.malicious_ips)
         continue
 
     to_update = per_time_interval.update(per_time)

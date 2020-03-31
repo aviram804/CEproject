@@ -105,28 +105,51 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
     brain_dict[MALICIOUS_IP] = list(malicious_ips)
     return brain_dict
 
+
+CHOSE_IP_PERCENT = 95
+RAND_IP_PERCENT = 4
+
+
 def get_ip(ips, malicious_ips):
+    """
+    Randomly choose ip from:
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: random IP
+    """
     ips = list(ips)
-    choser = random.randint(0, 100)
-    if choser < 95:
+    chooser = random.randint(0, 100)
+    if chooser <= CHOSE_IP_PERCENT:
         rand = random.randint(0, len(ips))
         return ips[rand - 1]
-    if choser < 100:
+    if chooser <= (CHOSE_IP_PERCENT + RAND_IP_PERCENT):
         return rand_ip()
     rand = random.randint(0, len(malicious_ips))
     return malicious_ips[rand - 1]
 
 
-
 def get_chunk(time, ips, malicious_ips):
+    """
+    creates a single chunk with time stamp
+    :param time: int, time stamp
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: PacketChunk - has a sender, a receiver, size and time
+    """
     sender = get_ip(ips, malicious_ips)
-    reciever = sender
-    while reciever == sender:
-        reciever = get_ip(ips, malicious_ips)
-    return PacketChunk(sender,reciever,my_size_func(),time)
+    receiver = sender
+    while receiver == sender:
+        receiver = get_ip(ips, malicious_ips)
+    return PacketChunk(sender, receiver, my_size_func(), time)
 
 
 def write_packet_chunks(ips, malicious_ips):
+    """
+    generates packets according to the ips presented in Brain - test tool
+    :param ips: all IPs in Brain
+    :param malicious_ips: all malicious IPs in Brain
+    :return: new input data
+    """
     list_chuncks = []
     malicious = list(malicious_ips)
     ips_list = list(ips)
@@ -138,10 +161,13 @@ def write_packet_chunks(ips, malicious_ips):
 
 
 def json_get_brain_chunks():
+    """
 
+    :return:
+    """
     data_dict = create_data(NUM_IPS, SECONDS, NUM_DIFFERENT_IPS, my_size_func, my_update_func)
     with open(FILE_NAME, 'w') as json_file:
         json.dump(data_dict, json_file)
     brain = Brain.generate_from_json(FILE_NAME)
-    list_chuncks = write_packet_chunks(brain.ip_set, brain.malicious_ips)
-    return brain, list_chuncks
+    list_chunks = write_packet_chunks(brain.ip_set, brain.malicious_ips)
+    return brain, list_chunks
