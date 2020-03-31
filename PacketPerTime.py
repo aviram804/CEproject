@@ -7,6 +7,7 @@ SENT = 0
 RECEIVED = 1
 IP_SET = set()
 
+
 class PacketPerTime:
 
     def __init__(self, packets, time):

@@ -35,15 +35,22 @@ class IPOverSent:
     Represents IP sent too much data
     """
 
-    def __init__(self, ip, time):
+    def __init__(self, ip, time, amount_data):
         """
         :param ip: string IP
         """
         self.ip = ip
         self.time = time
+        self.amount_data = amount_data
 
     def get_error(self):
         print("IP sent too much data ", self.ip, " at time ", self.time)
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, IPOverSent):
+            return other.ip == self.ip and other.time == self.time
+        return False
 
 
 class IPOverReceived:
@@ -51,12 +58,19 @@ class IPOverReceived:
     Represents IP received too much data
     """
 
-    def __init__(self, ip, time):
+    def __init__(self, ip, time, amount_data):
         """
         :param ip: string IP
         """
         self.ip = ip
         self.time = time
+        self.amount_data = amount_data
 
     def get_error(self):
         print("IP received too much data ", self.ip, " at time ", self.time)
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, IPOverReceived):
+            return other.ip == self.ip and other.time == self.time
+        return False

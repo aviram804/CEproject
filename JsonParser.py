@@ -4,6 +4,7 @@ from BrainDataChunk import BrainDataChunk
 from Brain import Brain
 from PacketChunk import *
 import random
+import Intrusions
 
 SET_SIZE = BrainDataChunk.get_scale_for_size
 DATA_TYPES = BrainDataChunk.TYPES
@@ -177,7 +178,7 @@ def write_packet_chunks(ips, malicious_ips):
     for i in range(SECONDS):
         for j in range(IPS_PER_TIME):
             list_chuncks.append(get_chunk(i, ips_list, malicious, my_size_func))
-    return list_chuncks
+    return list_chuncks, None
 
 
 INTRUSION_PERCENTAGE = 2
@@ -188,10 +189,10 @@ def write_intrusion_packet_chunk(ips, malicious_ips):
     generates packets according to the ips presented in Brain - with percentage for intrusion
     :param ips: all IPs in Brain
     :param malicious_ips: all malicious IPs in Brain
-    :return: new input data
+    :return: new input data, intrusions
     """
     list_chuncks = []
-    intrusion_chunks = {}
+    intrusion_chunks = set()
     malicious = list(malicious_ips)
     ips_list = list(ips)
 
@@ -203,18 +204,13 @@ def write_intrusion_packet_chunk(ips, malicious_ips):
                 size_func = intrusion_size_func
             chunk = get_chunk(i, ips_list, malicious, size_func)
             list_chuncks.append(chunk)
-            if rand < INTRUSION_PERCENTAGE:
-                if chunk.sender not in intrusion_chunks:
-                    intrusion_chunks[chunk.sender] = []
-                if chunk.receiver not in intrusion_chunks:
-                    intrusion_chunks[chunk.receiver] = []
-                intrusion_chunks[chunk.sender].append(i)
-                intrusion_chunks[chunk.receiver].append(i)
+            intrusion_chunks.add(Intrusions.IPOverReceived(chunk.receiver, chunk.amount, chunk.time))
+            intrusion_chunks.add(Intrusions.IPOverSent(chunk.sender, chunk.amount, chunk.time))
     # returns list of chunks to run on, and map of IP and list of intrusion at seconds
     return list_chuncks, intrusion_chunks
 
 
-def json_get_brain_chunks():
+def json_get_brain_chunks(packet_func):
     """
 
     :return:
@@ -223,5 +219,5 @@ def json_get_brain_chunks():
     with open(FILE_NAME, 'w') as json_file:
         json.dump(data_dict, json_file)
     brain = Brain.generate_from_json(FILE_NAME)
-    list_chunks = write_packet_chunks(brain.ip_set, brain.malicious_ips)
-    return brain, list_chunks
+    list_chunks, intrusions = packet_func(brain.ip_set, brain.malicious_ips)
+    return brain, list_chunks, intrusions
