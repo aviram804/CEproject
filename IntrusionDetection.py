@@ -75,6 +75,8 @@ def find_intrusion():
     brain, packets, ip_intrusions = JsonParser.json_get_brain_chunks(JsonParser.write_intrusion_packet_chunk)
     brain.generate_ip_country_map()
 
+    intrusions = []
+
     for packet in packets:
 
         # translate to our object
@@ -93,7 +95,7 @@ def find_intrusion():
             brain.update(to_update)
 
         brain_interval = brain.get_interval(current_time, PacketsPerInterval.INTERVAL)
-        intrusions = Detector.detect_intrusion(brain_interval, per_time_interval, brain.ip_set, brain.malicious_ips)
+        intrusions += Detector.detect_intrusion(brain_interval, per_time_interval, brain.ip_set, brain.malicious_ips)
         current_time += 1
         per_time = PacketPerTime({}, current_time)
 
