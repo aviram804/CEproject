@@ -9,6 +9,9 @@ MALICIOUS_IP = "malicious_ips"
 
 class Brain:
 
+    COUNTRY = 0
+    SIZE_FUNC = 1
+
     def __init__(self, data_map, ip_set, malicious_ips):
         """
         :param data_map: Dictionary-> Key=int-time   Value=PacketsPerTime
@@ -38,6 +41,7 @@ class Brain:
         :param dest: path to place csv
         :return:
         """
+        print("Generate Brain from JSON")
         malicious_ips = None
         packets_per_time_dict = {}
         with open(dest, 'r') as f:
@@ -46,7 +50,7 @@ class Brain:
             if key == MALICIOUS_IP:
                 malicious_ips = value
                 continue
-            packets_per_time_dict[key] = PacketPerTime.PacketPerTime.from_json(value, key)
+            packets_per_time_dict[int(key)] = PacketPerTime.PacketPerTime.from_json(value, key)
         return Brain(packets_per_time_dict, PacketPerTime.IP_SET, malicious_ips)
 
     def update(self, packets_per_time):
@@ -71,6 +75,7 @@ class Brain:
             time = current_time + i
             if time not in self.data_map.keys():
                 packet_interval.update(PacketPerTime.PacketPerTime({}, time))
+                print("WARNING - time", current_time + i, "not in Brain")
                 continue
             packet_interval.update(self.data_map[time])
         return packet_interval

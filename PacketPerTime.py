@@ -13,7 +13,7 @@ class PacketPerTime:
     def __init__(self, packets, time):
         """
 
-        :param packets: dictionary, key=IP, value=tuple(sent, received, num of updates)
+        :param packets: dictionary, key=IP, value=tuple(BrainDataChunk=sent, BrainDataChunk=received)
         """
         self.time = time
         self.packets_map = packets
@@ -32,6 +32,7 @@ class PacketPerTime:
         """
 
         :param obj_map:
+        :param time:
         :return:
         """
         packets = {}
@@ -55,9 +56,8 @@ class PacketPerTime:
         """
         adds chunk to chunks per time
         :param ip: ip to update
-        :param tup: BrainDataChunk tuple, sent received
+        :param tup: (BrainDataChunk, BrainDataChunk) tuple, sent received
         """
-        sent, recieved = tup
         if ip not in self.packets_map:
             self.packets_map[ip] = tup
             return

@@ -93,3 +93,6 @@ class BrainDataChunk:
             if string[j] == "=":
                 updates = int(string[j+1: len(string) - 1])
         return BrainDataChunk(scale, amount, updates)
+
+    def get_amount_data(self):
+        return self.amount_data * self.get_mult()

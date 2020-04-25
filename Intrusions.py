@@ -49,8 +49,11 @@ class IPOverSent:
     def __eq__(self, other):
         """Overrides the default implementation"""
         if isinstance(other, IPOverSent):
-            return other.ip == self.ip and other.time == self.time
+            return other.ip == self.ip and other.time + 5 >= self.time >= other.time - 5
         return False
+
+    def __hash__(self):
+        return hash(str(self.ip) + str(self.time))
 
 
 class IPOverReceived:
@@ -72,5 +75,8 @@ class IPOverReceived:
     def __eq__(self, other):
         """Overrides the default implementation"""
         if isinstance(other, IPOverReceived):
-            return other.ip == self.ip and other.time == self.time
+            return other.ip == self.ip and other.time + 5 >= self.time >= other.time - 5
         return False
+
+    def __hash__(self):
+        return hash(str(self.ip) + str(self.time))

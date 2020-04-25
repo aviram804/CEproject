@@ -30,36 +30,45 @@ TIME = 0
 def display_intrusions(detected_intrusions, created_intrusions):
     """
     displays information graph for detected intrusions, compared to created ones
-    :param intrusions: List, detected intrusions, List of Intrusions objects
+    :param detected_intrusions: List, detected intrusions, List of Intrusions objects
     :param created_intrusions: set, created intrusions
     """
-    counter = 0
+    print("Detected intrusion length=", len(detected_intrusions),  " With Created intrusion length=", len(created_intrusions))
     for intrusion in detected_intrusions:
-        if intrusion in created_intrusions:
-            # True Positive
-            plt.plot(counter, intrusion.amount, color="blue")
-            created_intrusions.remove(intrusion)
+        flag = False
+        for int in detected_intrusions:
+            if int == intrusion:
+                flag = True
+                break
+        # if intrusion not in detected_intrusions:
+        if flag:
+            print("True Positive")
+            plt.scatter(intrusion.time, intrusion.amount_data * 5, color="blue")
         else:
             # False Positive
-            plt.plot(counter, intrusion.amount, color="red")
-            pass
-        counter += 1
+            plt.scatter(intrusion.time, intrusion.amount_data, color="red")
+
+    print("Done First run")
 
     for intrusion in created_intrusions:
-        # True Negative
-        plt.plot(counter, intrusion.amount, color="yellow")
-        counter += 1
+        flag = False
+        for intr in detected_intrusions:
+            if intr == intrusion:
+                flag = True
+                break
+        if not flag:
+            # True Negative
+            plt.scatter(intrusion.time, intrusion.amount_data, color="yellow")
 
     plt.show()
 
-
-
-
-
 # brain:  BrainObj
 # brain = Brain.generate_from_json(JsonParser.FILE_NAME)
-
 # current_time = packets[0][TIME]
+
+
+MILLION = 1000000
+
 
 def find_intrusion():
 
@@ -71,11 +80,18 @@ def find_intrusion():
     # pet_time_interval: PacketPerInterval - last 5 PacketsPerTime
     per_time_interval = PacketsPerInterval([])
 
+    print("Start Generate Data")
+
     # Brain object, packets to run on.
     brain, packets, ip_intrusions = JsonParser.json_get_brain_chunks(JsonParser.write_intrusion_packet_chunk)
+
+    print("Finish Country Map")
+
     brain.generate_ip_country_map()
 
-    intrusions = []
+    print("Finish Generate Data")
+
+    intrusions = set()
 
     for packet in packets:
 
@@ -95,11 +111,13 @@ def find_intrusion():
             brain.update(to_update)
 
         brain_interval = brain.get_interval(current_time, PacketsPerInterval.INTERVAL)
-        intrusions += Detector.detect_intrusion(brain_interval, per_time_interval, brain.ip_set, brain.malicious_ips)
+        intrusions = intrusions.union(Detector.detect_intrusion(brain_interval, per_time_interval))
         current_time += 1
         per_time = PacketPerTime({}, current_time)
+
+    print("Done Detecting, painting graph")
 
     display_intrusions(intrusions, ip_intrusions)
 
 
-
+find_intrusion()

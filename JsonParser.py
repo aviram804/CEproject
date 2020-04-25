@@ -17,9 +17,9 @@ GB = BrainDataChunk.GB
 #                PARAMETRIC                 #
 #############################################
 
-NUM_IPS = 200
-NUM_DIFFERENT_IPS = 50
-SECONDS = 1000
+NUM_IPS = 10
+NUM_DIFFERENT_IPS = 10
+SECONDS = 50
 FUNC = np.random.randint
 
 BYTES_PERCENT = 50
@@ -39,7 +39,7 @@ LOW = 0
 HIGH = 1
 
 MEAN = 500
-VAR = 50
+VAR = 10
 
 
 def my_size_func():
@@ -53,7 +53,9 @@ def my_size_func():
     return abs(int(np.random.normal(mean, var)))
 
 
-ALPHA = 2
+# ALPHA = intrusion increased mean size
+ALPHA = 100
+# BETA = intrusion increased var size
 BETA = 1
 
 
@@ -72,7 +74,7 @@ def my_update_func():
     randomized function for number of updates
     :return: int
     """
-    return np.random.randint(1, 30)
+    return np.random.randint(1000, 3000)
 
 
 def rand_ip():
@@ -111,7 +113,7 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
     brain_dict = {}
     for i in range(seconds):
         time_dict = {}
-        indexes = np.random.choice(num_ips, num_different_ips)
+        indexes = np.random.choice(num_ips, num_different_ips, replace=False)
         for idx in indexes:
             size, data_type = SET_SIZE(size_func())
             sent = "(" + str(size) + data_type + ", updates=" + str(updates_func()) + ")"
@@ -161,7 +163,7 @@ def get_chunk(time, ips, malicious_ips, size_func):
     return PacketChunk(sender, receiver, size_func(), time)
 
 
-IPS_PER_TIME = 500
+IPS_PER_TIME = 10
 
 
 def write_packet_chunks(ips, malicious_ips):
@@ -181,7 +183,7 @@ def write_packet_chunks(ips, malicious_ips):
     return list_chuncks, None
 
 
-INTRUSION_PERCENTAGE = 2
+INTRUSION_PERCENTAGE = 9900
 
 
 def write_intrusion_packet_chunk(ips, malicious_ips):
@@ -199,13 +201,16 @@ def write_intrusion_packet_chunk(ips, malicious_ips):
     for i in range(SECONDS):
         for j in range(IPS_PER_TIME):
             size_func = my_size_func
-            rand = random.randint(0, 1000)
-            if rand < INTRUSION_PERCENTAGE:
+            rand = random.randint(0, 10000)
+            if rand >= INTRUSION_PERCENTAGE:
                 size_func = intrusion_size_func
+
             chunk = get_chunk(i, ips_list, malicious, size_func)
             list_chuncks.append(chunk)
-            intrusion_chunks.add(Intrusions.IPOverReceived(chunk.receiver, chunk.amount, chunk.time))
-            intrusion_chunks.add(Intrusions.IPOverSent(chunk.sender, chunk.amount, chunk.time))
+
+            if rand >= INTRUSION_PERCENTAGE:
+                intrusion_chunks.add(Intrusions.IPOverReceived(chunk.receiver, chunk.time, chunk.amount))
+                intrusion_chunks.add(Intrusions.IPOverSent(chunk.sender, chunk.time, chunk.amount))
     # returns list of chunks to run on, and map of IP and list of intrusion at seconds
     return list_chuncks, intrusion_chunks
 
