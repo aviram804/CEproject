@@ -12,16 +12,15 @@ class Brain:
     COUNTRY = 0
     SIZE_FUNC = 1
 
-    def __init__(self, data_map, ip_set, malicious_ips):
+    def __init__(self, data_map, ip_map, malicious_ips):
         """
         :param data_map: Dictionary-> Key=int-time   Value=PacketsPerTime
-        :param ip_set: set of all IP's
+        :param ip_map: set of all IP's
         :param malicious_ips: set of malicious IP's
         """
         self.data_map = data_map
-        self.ip_set = ip_set
+        self.ip_map = ip_map
         self.malicious_ips = malicious_ips
-        self.ip_country_map = {}
 
     def generate_jason(self, dest):
         """
@@ -110,16 +109,16 @@ class Brain:
         [3, "Germany"]
     ]
 
-    def generate_ip_country_map(self):
-        """
-        randomly generate ip to country map - test tool
-        """
-        brain_map = Brain.PERCENTAGE
-        for ip in self.ip_set:
-            chooser = randint(0, 100)
-            current = 0
-            for i in range(len(brain_map)):
-                current += brain_map[i][0]
-                if chooser <= current:
-                    self.ip_country_map[ip] = brain_map[i][1]
-                    break
+    # def generate_ip_country_map(self):
+    #     """
+    #     randomly generate ip to country map - test tool
+    #     """
+    #     brain_map = Brain.PERCENTAGE
+    #     for ip in self.ip_map.keys:
+    #         chooser = randint(0, 100)
+    #         current = 0
+    #         for i in range(len(brain_map)):
+    #             current += brain_map[i][0]
+    #             if chooser <= current:
+    #                 self.ip_country_map[ip] = brain_map[i][1]
+    #                 break

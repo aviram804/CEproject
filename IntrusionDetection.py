@@ -87,8 +87,6 @@ def find_intrusion():
 
     print("Finish Country Map")
 
-    brain.generate_ip_country_map()
-
     print("Finish Generate Data")
 
     intrusions = set()
