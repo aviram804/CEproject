@@ -3,7 +3,7 @@ import PacketPerTime
 from PacketsPerInterval import PacketsPerInterval
 import Intrusions
 
-ALIGNMENT_FACTOR = 10
+ALIGNMENT_FACTOR = 4
 
 
 def sum_ip_for_interval(ip, start_time, interval):

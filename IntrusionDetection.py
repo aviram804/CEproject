@@ -36,17 +36,17 @@ def display_intrusions(detected_intrusions, created_intrusions):
     print("Detected intrusion length=", len(detected_intrusions),  " With Created intrusion length=", len(created_intrusions))
     for intrusion in detected_intrusions:
         flag = False
-        for int in detected_intrusions:
+        for int in created_intrusions:
             if int == intrusion:
                 flag = True
                 break
         # if intrusion not in detected_intrusions:
         if flag:
-            print("True Positive")
+            # print("True Positive")
             plt.scatter(intrusion.time, intrusion.amount_data * 5, color="blue")
         else:
             # False Positive
-            plt.scatter(intrusion.time, intrusion.amount_data, color="red")
+            plt.scatter(intrusion.time, intrusion.amount_data * 5, color="red")
 
     print("Done First run")
 

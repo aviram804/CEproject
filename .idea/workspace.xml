@@ -3,11 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="2ede7232-feb3-4745-97bf-6443967d7ffe" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Brain.py" afterPath="$PROJECT_DIR$/Brain.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BrainDataChunk.py" afterPath="$PROJECT_DIR$/BrainDataChunk.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Detector.py" afterPath="$PROJECT_DIR$/Detector.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IntrusionDetection.py" afterPath="$PROJECT_DIR$/IntrusionDetection.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JsonParser.py" afterPath="$PROJECT_DIR$/JsonParser.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PacketPerTime.py" afterPath="$PROJECT_DIR$/PacketPerTime.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,7 +15,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PacketPerTime.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PacketPerTime.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PacketPerTime.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="180">
@@ -30,12 +27,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Detector.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Detector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Detector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="20">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="100">
+              <caret line="5" column="20" lean-forward="false" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -87,8 +86,8 @@
       <file leaf-file-name="IntrusionDetection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/IntrusionDetection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="87" column="31" lean-forward="false" selection-start-line="87" selection-start-column="31" selection-end-line="87" selection-end-column="31" />
+            <state relative-caret-position="660">
+              <caret line="33" column="54" lean-forward="true" selection-start-line="33" selection-start-column="54" selection-end-line="33" selection-end-column="54" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -114,6 +113,16 @@
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="data" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-4700">
+              <caret line="0" column="28240" lean-forward="false" selection-start-line="0" selection-start-column="28240" selection-end-line="0" selection-end-column="28240" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -163,12 +172,12 @@
         <option value="$PROJECT_DIR$/data" />
         <option value="$PROJECT_DIR$/PacketsPerInterval.py" />
         <option value="$PROJECT_DIR$/Intrusions.py" />
-        <option value="$PROJECT_DIR$/Detector.py" />
         <option value="$PROJECT_DIR$/Brain.py" />
         <option value="$PROJECT_DIR$/BrainDataChunk.py" />
-        <option value="$PROJECT_DIR$/IntrusionDetection.py" />
         <option value="$PROJECT_DIR$/PacketPerTime.py" />
         <option value="$PROJECT_DIR$/JsonParser.py" />
+        <option value="$PROJECT_DIR$/IntrusionDetection.py" />
+        <option value="$PROJECT_DIR$/Detector.py" />
       </list>
     </option>
   </component>
@@ -445,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587804476248</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="each IP have its own distribution">
+      <created>1587814796997</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1587814796997</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -535,7 +551,8 @@
     <MESSAGE value="added display" />
     <MESSAGE value="bug fix" />
     <MESSAGE value="bug fixes, Detector now detects intrusions" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixes, Detector now detects intrusions" />
+    <MESSAGE value="each IP have its own distribution" />
+    <option name="LAST_COMMIT_MESSAGE" value="each IP have its own distribution" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -623,7 +640,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="20" lean-forward="false" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="20" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -745,14 +764,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4300">
-          <caret line="0" column="27937" lean-forward="false" selection-start-line="0" selection-start-column="27937" selection-end-line="0" selection-end-column="27937" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PacketsPerInterval.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
@@ -767,16 +778,6 @@
           <caret line="21" column="28" lean-forward="false" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="28" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/IntrusionDetection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="87" column="31" lean-forward="false" selection-start-line="87" selection-start-column="31" selection-end-line="87" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -807,18 +808,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Detector.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PacketPerTime.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="24" column="11" lean-forward="true" selection-start-line="24" selection-start-column="11" selection-end-line="24" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4700">
+          <caret line="0" column="28240" lean-forward="false" selection-start-line="0" selection-start-column="28240" selection-end-line="0" selection-end-column="28240" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IntrusionDetection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="33" column="54" lean-forward="true" selection-start-line="33" selection-start-column="54" selection-end-line="33" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Detector.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="5" column="20" lean-forward="false" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
