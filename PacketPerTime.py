@@ -1,11 +1,11 @@
 import numpy as np
 from Detector import detect_intrusion
 from BrainDataChunk import BrainDataChunk
-import Brain
-import Intrusions
+
 
 SENT = 0
 RECEIVED = 1
+IP_SET = set()
 
 
 class PacketPerTime:
@@ -13,7 +13,7 @@ class PacketPerTime:
     def __init__(self, packets, time):
         """
 
-        :param packets: dictionary, key=IP, value=tuple(sent, received, num of updates)
+        :param packets: dictionary, key=IP, value=tuple(BrainDataChunk=sent, BrainDataChunk=received)
         """
         self.time = time
         self.packets_map = packets
@@ -32,11 +32,12 @@ class PacketPerTime:
         """
 
         :param obj_map:
+        :param time:
         :return:
         """
         packets = {}
         for ip, tup in obj_map.items():
-            Brain.IP_SET.add(ip)
+            IP_SET.add(ip)
             packets[ip] = (BrainDataChunk.get_from_str(tup[SENT]), BrainDataChunk.get_from_str(tup[RECEIVED]))
         return PacketPerTime(packets, time)
 
@@ -46,24 +47,20 @@ class PacketPerTime:
         :param other: PacketPerTime
         :return: updated PacketPerTime
         """
-        intrusions = []
         if other is None:
-            return intrusions
+            return
         for ip, tup in other.packets_map.items():
-            intrusion = self.add_chunk(ip, tup)
-            if intrusion is not None:
-                intrusions.append(intrusion)
-        return intrusions
+            self.add_chunk(ip, tup)
 
     def add_chunk(self, ip, tup):
         """
         adds chunk to chunks per time
         :param ip: ip to update
-        :param tup: BrainDataChunk tuple, sent received
+        :param tup: (BrainDataChunk, BrainDataChunk) tuple, sent received
         """
         if ip not in self.packets_map:
             self.packets_map[ip] = tup
-            return Intrusions.FoundNewIP(ip)
+            return
         self.packets_map[ip][SENT].update(tup[SENT])
         self.packets_map[ip][RECEIVED].update(tup[RECEIVED])
 
@@ -76,6 +73,6 @@ class PacketPerTime:
         chunk = BrainDataChunk("B", packet.amount, 1)
         empty = BrainDataChunk("B", 0, 0)
         sender = chunk, empty
-        reciever = empty, chunk
+        receiver = empty, chunk
         self.add_chunk(packet.sender, sender)
-        self.add_chunk(packet.reciever, reciever)
+        self.add_chunk(packet.receiver, receiver)

@@ -1,14 +1,16 @@
-from PacketPerTime import PacketPerTime
+import PacketPerTime
 from BrainDataChunk import BrainDataChunk
 from PacketsPerInterval import PacketsPerInterval
-import JsonParser
 import json
+from random import randint
 
-
-IP_SET = set()
 MALICIOUS_IP = "malicious_ips"
 
+
 class Brain:
+
+    COUNTRY = 0
+    SIZE_FUNC = 1
 
     def __init__(self, data_map, ip_set, malicious_ips):
         """
@@ -19,6 +21,7 @@ class Brain:
         self.data_map = data_map
         self.ip_set = ip_set
         self.malicious_ips = malicious_ips
+        self.ip_country_map = {}
 
     def generate_jason(self, dest):
         """
@@ -38,6 +41,7 @@ class Brain:
         :param dest: path to place csv
         :return:
         """
+        print("Generate Brain from JSON")
         malicious_ips = None
         packets_per_time_dict = {}
         with open(dest, 'r') as f:
@@ -46,11 +50,19 @@ class Brain:
             if key == MALICIOUS_IP:
                 malicious_ips = value
                 continue
-            packets_per_time_dict[key] = PacketPerTime.from_json(value, key)
-        return Brain(packets_per_time_dict, IP_SET, malicious_ips)
+            packets_per_time_dict[int(key)] = PacketPerTime.PacketPerTime.from_json(value, key)
+        return Brain(packets_per_time_dict, PacketPerTime.IP_SET, malicious_ips)
 
     def update(self, packets_per_time):
-            return self.data_map[packets_per_time.time].update(packets_per_time)
+        """
+        updates packet_per_time  inside Brain
+        :param packets_per_time: PacketPerTime
+        :return: list of intrusions detected (new, malicious ip's)
+        """
+        if packets_per_time.time not in self.data_map:
+            self.data_map[packets_per_time.time] = packets_per_time
+            return
+        self.data_map[packets_per_time.time].update(packets_per_time)
 
     def get_interval(self, current_time, interval):
         """
@@ -62,14 +74,52 @@ class Brain:
         for i in range(interval):
             time = current_time + i
             if time not in self.data_map.keys():
-                packet_interval.update([])
+                packet_interval.update(PacketPerTime.PacketPerTime({}, time))
+                print("WARNING - time", current_time + i, "not in Brain")
+                continue
             packet_interval.update(self.data_map[time])
+        return packet_interval
 
-    def add_malicious_ips(self, IP):
-        self.malicious_ips.add(IP)
+    def add_malicious_ips(self, ip):
+        """
+        adds ip to malicious_ips set
+        :param ip: string, IP
+        """
+        self.malicious_ips.add(ip)
 
-    def is_malicious_ips(self, IP):
-        return IP in self.malicious_ips
+    def is_malicious_ips(self, ip):
+        """
+        :param ip: string, IP
+        :return: boolean, is malicious ip
+        """
+        return ip in self.malicious_ips
 
-if __name__ == '__main__':
-    brain = Brain.generate_from_json(JsonParser.FILE_NAME)
+    def load_ip_country_map(self, filename):
+        """
+        loads ip to country map using filename
+        :param filename: string
+        """
+        pass
+
+# COUNTRIES PERCENTAGE:
+    PERCENTAGE = [
+        [88, "Israel"],
+        [3, "China"],
+        [3, "USA"],
+        [3, "GBR"],
+        [3, "Germany"]
+    ]
+
+    def generate_ip_country_map(self):
+        """
+        randomly generate ip to country map - test tool
+        """
+        brain_map = Brain.PERCENTAGE
+        for ip in self.ip_set:
+            chooser = randint(0, 100)
+            current = 0
+            for i in range(len(brain_map)):
+                current += brain_map[i][0]
+                if chooser <= current:
+                    self.ip_country_map[ip] = brain_map[i][1]
+                    break

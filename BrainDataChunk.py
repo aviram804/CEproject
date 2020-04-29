@@ -25,6 +25,8 @@ class BrainDataChunk:
         :return:
         """
         total_data = self.get_total_data() + other.get_total_data()
+        if self.num_of_updates + other.num_of_updates == 0:
+            return
         self.amount_data = int(total_data / (self.num_of_updates + other.num_of_updates))
         self.set_scale()
         self.num_of_updates += other.num_of_updates
@@ -91,3 +93,6 @@ class BrainDataChunk:
             if string[j] == "=":
                 updates = int(string[j+1: len(string) - 1])
         return BrainDataChunk(scale, amount, updates)
+
+    def get_amount_data(self):
+        return self.amount_data * self.get_mult()
