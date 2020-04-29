@@ -42,7 +42,7 @@ LOW = 0
 HIGH = 1
 
 MEAN = 500
-VAR = 10
+VAR = 1000
 
 REGULAR_SIZE = False
 INTRUSION_SIZE = True
@@ -60,7 +60,7 @@ def my_size_func():
     # return np.random.randint(1, 100)
     mean = np.random.randint(MEAN - VAR, MEAN + VAR)
     var = np.random.randint(0, 2*VAR)
-    return lambda: abs(int(np.random.normal(mean, var)))
+    return lambda: abs(int(np.random.normal(mean, var))), var
     # return abs(int(np.random.normal(mean, var)))
 
 
@@ -130,10 +130,10 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
         time_dict = {}
         indexes = np.random.choice(num_ips, num_different_ips, replace=False)
         for idx in indexes:
-            size, data_type = SET_SIZE(size_dict[ips[idx]]())
-            sent = "(" + str(size) + data_type + ", updates=" + str(updates_func()) + ")"
-            size, data_type = SET_SIZE(size_dict[ips[idx]]())
-            receive = "(" + str(size) + data_type + ", updates=" + str(updates_func()) + ")"
+            size, data_type = SET_SIZE(size_dict[ips[idx]][0]())
+            sent = "(" + str(size) + data_type + "," + " var=" + str(size_dict[ips[idx]][1]) + " updates=" + str(updates_func()) + ")"
+            size, data_type = SET_SIZE(size_dict[ips[idx]][0]())
+            receive = "(" + str(size) + data_type + "," + " var=" + str(size_dict[ips[idx]][1]) + " updates=" + str(updates_func()) + ")"
             time_dict[ips[idx]] = [sent, receive]
 
         brain_dict[i] = time_dict
@@ -166,9 +166,9 @@ def get_ip(ips, malicious_ips):
 def get_size_for_ip(ip, size_type):
     if ip in size_dict.keys():
         if size_type == REGULAR_SIZE:
-            return size_dict[ip]()
-        return size_dict[ip]() * np.random.randint(SMALL_INTRUSION, LARGE_INTRUSION)
-    return my_size_func()()
+            return size_dict[ip][0]()
+        return size_dict[ip][0]() * np.random.randint(SMALL_INTRUSION, LARGE_INTRUSION)
+    return (my_size_func()[0])()
 
 
 def get_chunk(time, ips, malicious_ips, size_func_type):

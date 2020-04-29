@@ -70,8 +70,8 @@ class PacketPerTime:
         :param packet: PacketChunk, sender receiver ip's and amount of data
         :return:
         """
-        chunk = BrainDataChunk(packet.amount, 1)
-        empty = BrainDataChunk(0, 0)
+        chunk = BrainDataChunk(packet.amount, var=0, updates=1)
+        empty = BrainDataChunk(amount=0, var=0, updates=1)
         sender = chunk, empty
         receiver = empty, chunk
         self.add_chunk(packet.sender, sender)

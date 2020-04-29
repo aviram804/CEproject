@@ -18,7 +18,7 @@ def sum_ip_for_interval(ip, start_time, interval):
     for i in range(start_time, len(interval)):
         packet_per_time = interval[i]
         if ip in packet_per_time.packets_map:
-            data_sent += packet_per_time.packets_m ap[ip][PacketPerTime.SENT].get_amount_data()
+            data_sent += packet_per_time.packets_map[ip][PacketPerTime.SENT].get_amount_data()
             data_received += packet_per_time.packets_map[ip][PacketPerTime.RECEIVED].get_amount_data()
     data_sent /= len(interval)
     data_received /= len(interval)
