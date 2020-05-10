@@ -38,7 +38,7 @@ class BrainDataChunk:
         d2 = x2 - self.mean
         d1 = x1 - self.mean
 
-        (n1*(s1 + d1) + n2*(s2 + d2)) / (n1 + n2)
+        self.variance = (n1*(s1 + d1*d1) + n2*(s2 + d2*d2)) / (n1 + n2)
         self.num_of_updates += other.num_of_updates
 
     @staticmethod
@@ -73,7 +73,8 @@ class BrainDataChunk:
         :return: string representation
         """
         size, scale_type = BrainDataChunk.get_scale_for_size(self.mean)
-        return "(" + str(size) + scale_type + "," + " var=" + str(self.variance) + " updates=" + str(self.num_of_updates) + ")"
+        variance = str(int(self.variance * 1000) / 1000)
+        return "(" + str(size) + scale_type + "," + " var=" + variance + " updates=" + str(self.num_of_updates) + ")"
 
     def get_total_data(self):
         """
@@ -104,7 +105,7 @@ class BrainDataChunk:
             if string[j] == "=":
                 for i in range(j + 1, len(string) - 1):
                     if string[i] == "=":
-                        variance = int(string[j + 1: i - len("updates")])
+                        variance = float(string[j + 1: i - len("updates")])
                         updates = int(string[i + 1: len(string) - 1])
 
         return BrainDataChunk(amount * BrainDataChunk.get_mult_for_type(scale), variance, updates)
@@ -114,3 +115,6 @@ class BrainDataChunk:
         :return: amount data in chunk
         """
         return self.mean
+
+    def get_variance(self):
+        return self.variance

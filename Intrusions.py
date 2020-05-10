@@ -14,6 +14,9 @@ class FoundNewIP:
     def get_error(self):
         print("New IP Warning ", self.ip)
 
+    def __str__(self):
+        return "Intrusion FoundNewIP: For IP="+str(self.ip)
+
 
 class FoundMaliciousIP:
     """
@@ -28,6 +31,9 @@ class FoundMaliciousIP:
 
     def get_error(self):
         print("Malicious IP Warning ", self.ip)
+
+    def __str__(self):
+        return "Intrusion FoundMaliciousIP: For IP="+str(self.ip)
 
 
 class IPOverSent:
@@ -55,6 +61,9 @@ class IPOverSent:
     def __hash__(self):
         return hash(str(self.ip) + str(self.time))
 
+    def __str__(self):
+        return "Intrusion IPOverSent at Time: "+str(self.time)+" with IP="+str(self.ip)+" for amount of data="+str(self.amount_data)
+
 
 class IPOverReceived:
     """
@@ -80,3 +89,7 @@ class IPOverReceived:
 
     def __hash__(self):
         return hash(str(self.ip) + str(self.time))
+
+    def __str__(self):
+
+        return "Intrusion IPOverReceived at Time: "+str(self.time)+" with IP="+str(self.ip)+" for amount of data="+str(self.amount_data)

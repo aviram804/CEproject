@@ -71,10 +71,9 @@ class Brain:
         """
         packet_interval = PacketsPerInterval([])
         for i in range(interval):
-            time = current_time + i
+            time = (current_time + i) % 60
             if time not in self.data_map.keys():
                 packet_interval.update(PacketPerTime.PacketPerTime({}, time))
-                print("WARNING - time", current_time + i, "not in Brain")
                 continue
             packet_interval.update(self.data_map[time])
         return packet_interval

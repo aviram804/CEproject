@@ -23,8 +23,13 @@ class PacketPerTime:
         :return:
         """
         out_map = {}
-        for ip, tup in self.packets_map.items():
-            out_map[ip] = (tup[SENT].get_str(), tup[RECEIVED].get_str())
+        # Key=IP Value=(Sent,Received)
+        # for ip, tup in self.packets_map.items():
+        #     out_map[ip] = (tup[SENT].get_str(), tup[RECEIVED].get_str())
+
+        # Key=(IPSent, Received) Value=(BrainDataChunk)
+        for ip, brainDataChunk in self.packets_map.items():
+            out_map[ip] = brainDataChunk.get_str()
         return out_map
 
     @staticmethod
@@ -35,10 +40,24 @@ class PacketPerTime:
         :param time:
         :return:
         """
+
         packets = {}
-        for ip, tup in obj_map.items():
-            IP_SET.add(ip)
-            packets[ip] = (BrainDataChunk.get_from_str(tup[SENT]), BrainDataChunk.get_from_str(tup[RECEIVED]))
+        # Key=IP Value=(Sent,Received)
+        # for ip, tup in obj_map.items():
+        #     IP_SET.add(ip)
+        #     packets[ip] = (BrainDataChunk.get_from_str(tup[SENT]), BrainDataChunk.get_from_str(tup[RECEIVED]))
+
+        # Key=(IPSent, Received) Value=(BrainDataChunk)
+        for ip, brainDataChunk in obj_map.items():
+            split_index = 0
+            for c in ip:
+                split_index += 1
+                if c == ':':
+                    break
+            IP_SET.add(ip[:split_index])
+            IP_SET.add(ip[split_index+1:])
+            packets[ip] = BrainDataChunk.get_from_str(brainDataChunk)
+
         return PacketPerTime(packets, time)
 
     def update(self, other):
@@ -49,20 +68,31 @@ class PacketPerTime:
         """
         if other is None:
             return
-        for ip, tup in other.packets_map.items():
-            self.add_chunk(ip, tup)
 
-    def add_chunk(self, ip, tup):
+        # Key=IP Value=(Sent,Received)
+        # for ip, tup in other.packets_map.items():
+        #     self.add_chunk(ip, tup)
+
+        # Key=(IPSent, Received) Value=(BrainDataChunk)
+        for ip, brainDataChunk in other.packets_map.items():
+            self.add_chunk(ip, brainDataChunk)
+
+    def add_chunk(self, ip, chunk):
         """
         adds chunk to chunks per time
         :param ip: ip to update
-        :param tup: (BrainDataChunk, BrainDataChunk) tuple, sent received
+        :param chunk: (BrainDataChunk, BrainDataChunk) tuple, sent received
         """
         if ip not in self.packets_map:
-            self.packets_map[ip] = tup
+            self.packets_map[ip] = chunk
             return
-        self.packets_map[ip][SENT].update(tup[SENT])
-        self.packets_map[ip][RECEIVED].update(tup[RECEIVED])
+
+        # Key=IP Value=(Sent,Received)
+        # self.packets_map[ip][SENT].update(chunk[SENT])
+        # self.packets_map[ip][RECEIVED].update(chunk[RECEIVED])
+
+        # Key=(IPSent, Received) Value=(BrainDataChunk)
+        self.packets_map[ip].update(chunk)
 
     def add_packet(self, packet):
         """
@@ -70,9 +100,15 @@ class PacketPerTime:
         :param packet: PacketChunk, sender receiver ip's and amount of data
         :return:
         """
+        # Key=IP Value=(Sent,Received)
+        # chunk = BrainDataChunk(packet.amount, var=0, updates=1)
+        # empty = BrainDataChunk(amount=0, var=0, updates=1)
+        # sender = chunk, empty
+        # receiver = empty, chunk
+        # self.add_chunk(packet.sender, sender)
+        # self.add_chunk(packet.receiver, receiver)
+
+        # Key=(IPSent, Received) Value=(BrainDataChunk)
         chunk = BrainDataChunk(packet.amount, var=0, updates=1)
-        empty = BrainDataChunk(amount=0, var=0, updates=1)
-        sender = chunk, empty
-        receiver = empty, chunk
-        self.add_chunk(packet.sender, sender)
-        self.add_chunk(packet.receiver, receiver)
+        ips = packet.sender + ":" + packet.receiver
+        self.add_chunk(ips, chunk)
