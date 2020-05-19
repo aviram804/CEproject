@@ -26,7 +26,7 @@ BYTES_PERCENT = 50
 KB_PERCENT = 45
 MB_PERCENT = 4
 
-SMALL_INTRUSION = 2
+SMALL_INTRUSION = 20
 LARGE_INTRUSION = 50
 
 FILE_NAME = "C:\\Users\\USER\\Documents\\Mypythons\\CEproject\\data"
@@ -42,7 +42,9 @@ LOW = 0
 HIGH = 1
 
 MEAN = 500
-VAR = 1000
+RANDOM_MEAN = 400
+VAR = 500
+RANDOM_VAR = 250
 
 REGULAR_SIZE = False
 INTRUSION_SIZE = True
@@ -58,8 +60,9 @@ def my_size_func():
     :return: int
     """
     # return np.random.randint(1, 100)
-    mean = np.random.randint(MEAN - VAR, MEAN + VAR)
-    var = np.random.randint(0, 2*VAR)
+    mean = np.random.randint(MEAN - RANDOM_MEAN, MEAN + RANDOM_MEAN)
+    standard_deviation = np.random.randint(VAR - RANDOM_VAR, VAR + RANDOM_VAR)
+    var = standard_deviation ** 2
     return lambda: abs(int(np.random.normal(mean, var))), var
     # return abs(int(np.random.normal(mean, var)))
 
@@ -141,7 +144,7 @@ def create_data(num_ips, seconds, num_different_ips, size_func, updates_func):
     return brain_dict
 
 
-CHOSE_IP_PERCENT = 98
+CHOSE_IP_PERCENT = 100
 RAND_IP_PERCENT = 1
 
 

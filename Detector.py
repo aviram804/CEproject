@@ -44,7 +44,7 @@ def sum_ip_for_interval_2_ip_key(ip, start_time, interval):
     return data_sent, var_sent
 
 
-STANDARD_DEVIATION = 4
+STANDARD_DEVIATION = 2
 
 
 def detect_intrusion(per_time_brain_interval, per_time_interval):
@@ -68,15 +68,15 @@ def detect_intrusion(per_time_brain_interval, per_time_interval):
 
             # testing curr_ip
             # Key=IP Value=(Sent,Received)
-            # data_sent, data_received, _, _ = sum_ip_for_interval(curr_ip, time, interval)
-            # brain_sent, brain_received, brain_var, variance_received = sum_ip_for_interval(curr_ip, 0, brain_interval)
+            data_sent, data_received, _, _ = sum_ip_for_interval(curr_ip, time, interval)
+            brain_sent, brain_received, brain_var, variance_received = sum_ip_for_interval(curr_ip, 0, brain_interval)
 
             # testing curr_ip
             # Key=(IPSent, Received) Value=(BrainDataChunk)
-            data_sent, _ = sum_ip_for_interval_2_ip_key(curr_ip, time, interval)
-            brain_sent, brain_var = sum_ip_for_interval_2_ip_key(curr_ip, 0, brain_interval)
+            # data_sent, _ = sum_ip_for_interval_2_ip_key(curr_ip, time, interval)
+            # brain_sent, brain_var = sum_ip_for_interval_2_ip_key(curr_ip, 0, brain_interval)
 
-            if data_sent > brain_sent + STANDARD_DEVIATION*(brain_var ** 0.5):
+            if data_sent > brain_sent + STANDARD_DEVIATION * (brain_var ** 0.5):
 
                 intrusion = Intrusions.IPOverSent(curr_ip, intrusion_time, data_sent)
 

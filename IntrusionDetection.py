@@ -2,10 +2,12 @@ import pyshark
 from PacketPerTime import PacketPerTime
 from Brain import Brain
 import Detector
+from numpy import random
 from PacketsPerInterval import PacketsPerInterval
 import JsonParser
 from matplotlib import pyplot as plt
 from PacketChunk import PacketChunk
+from Intrusions import IPOverSent
 
 """
 this script parsing a pcapng file that generate on wireShark 
@@ -40,13 +42,13 @@ def display_intrusions(detected_intrusions, created_intrusions):
     :param created_intrusions: set, created intrusions
     """
     print("Detected intrusion length=", len(detected_intrusions),  " With Created intrusion length=", len(created_intrusions))
+    detected = set(detected_intrusions)
     for intrusion in detected_intrusions:
         flag = False
         for intrusion2 in created_intrusions:
             if intrusion2 == intrusion:
                 flag = True
                 break
-        # if intrusion not in detected_intrusions:
         if flag:
             # print("True Positive")
             plt.scatter(intrusion.time, intrusion.amount_data * 5, color="blue")
@@ -75,11 +77,12 @@ def display_intrusions(detected_intrusions, created_intrusions):
 
 MILLION = 1000000
 
-sharkFilePath = "learnable_data/new_data.pcapng"
-brainPath = ""
+# sharkFilePath = "learnable_data/2_sec_data_9.pcapng"
+sharkFilePath = "learnable_data/2_sec_data_7_listening_to_youtube.pcapng"
+brainPath = "brainNewData"
+
 
 def find_intrusion():
-
 
     # pet_time_interval: PacketPerInterval - last 5 PacketsPerTime
     per_time_interval = PacketsPerInterval([])
@@ -91,23 +94,32 @@ def find_intrusion():
 
     # brain = Brain({}, {}, ())
 
-    brain = Brain.generate_from_json("data2ip")
+    brain = Brain.generate_from_json(brainPath)
 
     print("Finish Country Map")
 
     print("Finish Generate Data")
 
     intrusions = set()
+    ip_intrusions = set()
 
     packets = pyshark.FileCapture(sharkFilePath)
 
-    current_time = parse(packets[0]).time
+    index = 0
+    while not parse(packets[index]):
+        index += 1
+
+    current_time = parse(packets[index]).time
+
+    # current_time = 0
     per_time = PacketPerTime({}, current_time)
 
     for packet in packets:
 
         # translate to our object
         packet_chunk = parse(packet)
+
+        # packet_chunk = packet
 
         if not packet_chunk:
             continue
@@ -116,10 +128,18 @@ def find_intrusion():
         # packet_chunk = packet
         # current_time = packet_chunk.time
         if packet_chunk.time == current_time:
+
+            # probabilty = 1
+            # rand = random.randint(0, 100)
+
+            # if rand < probabilty:
+            #     packet_chunk.amount *= 4
+            #     ip_intrusions.add(IPOverSent(packet_chunk.sender, current_time, packet_chunk.amount))
+
+
             per_time.add_packet(packet_chunk)
             # Detector.find_new_ips([packet_chunk.sender, packet_chunk.receiver], brain.ip_set, brain.malicious_ips)
             continue
-
         to_update = per_time_interval.update(per_time)
         if to_update is not None:
             brain.update(to_update)
@@ -128,15 +148,15 @@ def find_intrusion():
         brain_interval = brain.get_interval(start_time, PacketsPerInterval.INTERVAL)
         intrusions = intrusions.union(Detector.detect_intrusion(brain_interval, per_time_interval))
         # print("Intrusions len for time:", current_time, " = ", len(intrusions))
-        current_time = packet_chunk.time
+        current_time += 1
         per_time = PacketPerTime({}, current_time)
 
     for packet_per_time in per_time_interval.packets:
         brain.update(packet_per_time)
 
     print("Done Detecting, painting graph")
-    brain.generate_jason("data2ip")
-    # display_intrusions(intrusions, ip_intrusions)
+    # brain.generate_jason(brainPath)
+    display_intrusions(intrusions, ip_intrusions)
     for intrusion in intrusions:
         print(intrusion)
     exit()
