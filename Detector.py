@@ -32,10 +32,6 @@ def sum_ip_for_interval(ip, start_time, interval):
     :param interval: PacketPerTimeInterval
     :return: mean sent, mean received per interval
     """
-    data_sent = 0
-    data_received = 0
-    var_sent = 0
-    var_received = 0
     chunk_sent = BrainDataChunk(0, 0, 0)
     chunk_received = BrainDataChunk(0, 0, 0)
     for i in range(start_time, len(interval)):
@@ -47,7 +43,7 @@ def sum_ip_for_interval(ip, start_time, interval):
     data_sent = chunk_sent.mean
     var_sent = chunk_sent.variance
     var_received = chunk_sent.variance
-    return data_sent, data_received, var_sent, var_received
+    return data_sent, data_received, var_sent, var_received, chunk_sent.num_of_updates
 
 
 def sum_ip_for_interval_2_ip_key(ip, start_time, interval):
@@ -91,9 +87,10 @@ def detect_intrusion(per_time_brain_interval, per_time_interval):
 
             # testing curr_ip
             # Key=IP Value=(Sent,Received)
-            data_sent, data_received, _, _ = sum_ip_for_interval(curr_ip, time, interval)
-            brain_sent, brain_received, brain_var, variance_received = sum_ip_for_interval(curr_ip, 0, brain_interval)
-
+            data_sent, data_received, _, _, updates = sum_ip_for_interval(curr_ip, time, interval)
+            brain_sent, brain_received, brain_var, variance_received, updates = sum_ip_for_interval(curr_ip, 0, brain_interval)
+            if updates < 3:
+                continue
             # testing curr_ip
             # Key=(IPSent, Received) Value=(BrainDataChunk)
             # data_sent, _ = sum_ip_for_interval_2_ip_key(curr_ip, time, interval)

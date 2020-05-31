@@ -78,7 +78,7 @@ def display_intrusions(detected_intrusions, created_intrusions):
 MILLION = 1000000
 
 # sharkFilePath = "learnable_data/2_sec_data_9.pcapng"
-sharkFilePath = "learnable_data/2_sec_data_7_listening_to_youtube.pcapng"
+sharkFilePath = "learnable_data/2_sec_data_10.pcapng"
 brainPath = "brainNewData"
 
 
@@ -92,9 +92,9 @@ def find_intrusion():
     # Brain object, packets to run on.
     # brain, packets, ip_intrusions = JsonParser.json_get_brain_chunks(JsonParser.write_intrusion_packet_chunk)
 
-    brain = Brain({}, {}, ())
+    # brain = Brain({}, {}, ())
 
-    # brain = Brain.generate_from_json(brainPath)
+    brain = Brain.generate_from_json(brainPath)
 
     print("Finish Country Map")
 
@@ -129,12 +129,12 @@ def find_intrusion():
         # current_time = packet_chunk.time
         if packet_chunk.time == current_time:
 
-            # probabilty = 1
-            # rand = random.randint(0, 100)
+            probabilty = 5
+            rand = random.randint(0, 100)
 
-            # if rand < probabilty:
-            #     packet_chunk.amount *= 4
-            #     ip_intrusions.add(IPOverSent(packet_chunk.sender, current_time, packet_chunk.amount))
+            if rand < probabilty:
+                packet_chunk.amount *= 40
+                ip_intrusions.add(IPOverSent(packet_chunk.sender, current_time, packet_chunk.amount))
 
 
             per_time.add_packet(packet_chunk)
