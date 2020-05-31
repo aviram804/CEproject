@@ -39,11 +39,7 @@ def sum_ip_for_interval(ip, start_time, interval):
         if ip in packet_per_time.packets_map:
             update(chunk_sent, packet_per_time.packets_map[ip][PacketPerTime.SENT])
             update(chunk_received, packet_per_time.packets_map[ip][PacketPerTime.RECEIVED])
-    data_received = chunk_received.mean
-    data_sent = chunk_sent.mean
-    var_sent = chunk_sent.variance
-    var_received = chunk_sent.variance
-    return data_sent, data_received, var_sent, var_received, chunk_sent.num_of_updates
+    return chunk_sent, chunk_received
 
 
 def sum_ip_for_interval_2_ip_key(ip, start_time, interval):
@@ -87,21 +83,21 @@ def detect_intrusion(per_time_brain_interval, per_time_interval):
 
             # testing curr_ip
             # Key=IP Value=(Sent,Received)
-            data_sent, data_received, _, _, updates = sum_ip_for_interval(curr_ip, time, interval)
-            brain_sent, brain_received, brain_var, variance_received, updates = sum_ip_for_interval(curr_ip, 0, brain_interval)
-            if updates < 3:
-                continue
+            data_sent, data_received = sum_ip_for_interval(curr_ip, time, interval)
+            brain_sent, brain_received = sum_ip_for_interval(curr_ip, 0, brain_interval)
             # testing curr_ip
             # Key=(IPSent, Received) Value=(BrainDataChunk)
             # data_sent, _ = sum_ip_for_interval_2_ip_key(curr_ip, time, interval)
             # brain_sent, brain_var = sum_ip_for_interval_2_ip_key(curr_ip, 0, brain_interval)
 
-            if data_sent > brain_sent + STANDARD_DEVIATION * (brain_var ** 0.5):
+            if data_sent.mean > brain_sent.mean + STANDARD_DEVIATION * (brain_sent.variance ** 0.5):
 
+                if brain_sent.num_of_updates < 3:
+                    continue
                 intrusion = Intrusions.IPOverSent(curr_ip, intrusion_time, data_sent)
 
                 print(intrusion)
-                print("brain_sent=", brain_sent, " with variance_sent=", brain_var)
+                print("brain_sent=", brain_sent, " with variance_sent=", brain_sent.variance)
 
                 intrusions.add(intrusion)
 
