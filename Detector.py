@@ -2,8 +2,27 @@ import numpy as np
 import PacketPerTime
 from PacketsPerInterval import PacketsPerInterval
 import Intrusions
+from BrainDataChunk import BrainDataChunk
 
 ALIGNMENT_FACTOR = 4
+
+
+def update(chunk1, chunk2):
+    n1 = chunk1.num_of_updates
+    n2 = chunk2.num_of_updates
+    x1 = chunk1.mean
+    x2 = chunk2.mean
+    s1 = chunk1.variance
+    s2 = chunk2.variance
+
+    if chunk1.num_of_updates + chunk2.num_of_updates == 0:
+        return
+    total_data = chunk1.get_total_data() + chunk2.get_total_data()
+    chunk1.mean = int(total_data / (chunk1.num_of_updates + chunk2.num_of_updates))
+    d2 = x2 - chunk1.mean
+    d1 = x1 - chunk1.mean
+    chunk1.variance = (n1 * (s1 + d1 * d1) + n2 * (s2 + d2 * d2)) / (n1 + n2)
+    chunk1.num_of_updates += chunk2.num_of_updates
 
 
 def sum_ip_for_interval(ip, start_time, interval):
@@ -17,13 +36,17 @@ def sum_ip_for_interval(ip, start_time, interval):
     data_received = 0
     var_sent = 0
     var_received = 0
+    chunk_sent = BrainDataChunk(0, 0, 0)
+    chunk_received = BrainDataChunk(0, 0, 0)
     for i in range(start_time, len(interval)):
         packet_per_time = interval[i]
         if ip in packet_per_time.packets_map:
-            var_sent = max(var_sent, packet_per_time.packets_map[ip][PacketPerTime.SENT].get_variance())
-            var_received = max(var_sent, packet_per_time.packets_map[ip][PacketPerTime.RECEIVED].get_variance())
-            data_sent = max(data_sent, packet_per_time.packets_map[ip][PacketPerTime.SENT].get_amount_data())
-            data_received = max(data_received, packet_per_time.packets_map[ip][PacketPerTime.RECEIVED].get_amount_data())
+            update(chunk_sent, packet_per_time.packets_map[ip][PacketPerTime.SENT])
+            update(chunk_received, packet_per_time.packets_map[ip][PacketPerTime.RECEIVED])
+    data_received = chunk_received.mean
+    data_sent = chunk_sent.mean
+    var_sent = chunk_sent.variance
+    var_received = chunk_sent.variance
     return data_sent, data_received, var_sent, var_received
 
 

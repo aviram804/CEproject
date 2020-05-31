@@ -92,9 +92,9 @@ def find_intrusion():
     # Brain object, packets to run on.
     # brain, packets, ip_intrusions = JsonParser.json_get_brain_chunks(JsonParser.write_intrusion_packet_chunk)
 
-    # brain = Brain({}, {}, ())
+    brain = Brain({}, {}, ())
 
-    brain = Brain.generate_from_json(brainPath)
+    # brain = Brain.generate_from_json(brainPath)
 
     print("Finish Country Map")
 
